@@ -26,6 +26,7 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-pr
 const openWaybillPDF  = (orderId) => { const t = localStorage.getItem('hamsaad_token'); window.open(`${BASE_URL}/api/pdf/waybill/${orderId}?token=${t}`, '_blank'); };
 const openDeliveryPDF = (orderId) => { const t = localStorage.getItem('hamsaad_token'); window.open(`${BASE_URL}/api/pdf/delivery-note/${orderId}?token=${t}`, '_blank'); };
 
+// eslint-disable-next-line no-unused-vars
 const isImageFile = (url) => /\.(jpg|jpeg|png|gif|webp)$/i.test(url || '');
 
 const getStatusStyle = (status) => {
@@ -527,6 +528,7 @@ useEffect(() => {
                 </td>
               </tr>
             ) : orders.map(o => {
+              // eslint-disable-next-line no-unused-vars
               const s = getStatusStyle(o.status);
               //const showDocs = o.status !== 'created';
                 const showDocs = o.status === 'confirmed' || o.status === 'released';

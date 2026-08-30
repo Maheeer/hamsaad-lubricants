@@ -193,11 +193,14 @@ export default function Orders() {
       alert('Failed to load order details.');
     }
   };
-
+  
+  // eslint-disable-next-line no-unused-vars
   const downloadWaybill = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
     window.open(`http://localhost:5000/api/pdf/waybill/${orderId}?token=${token}`, '_blank');
   };
+
+  // eslint-disable-next-line no-unused-vars
   const downloadInvoice = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
     window.open(`http://localhost:5000/api/pdf/invoice/${orderId}?token=${token}`, '_blank');

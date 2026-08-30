@@ -209,6 +209,8 @@ const StorekeeperHome = () => {
   const pendingRelease  = orders.filter(o => o.status === 'confirmed');
   const awaitingWaybill = orders.filter(o => o.status === 'released');
   const lowStock        = products.filter(p => p.quantity_in_stock <= p.minimum_threshold);
+  
+  // eslint-disable-next-line no-unused-vars
   const totalStockValue = products.reduce((s, p) => s + (parseFloat(p.selling_price || 0) * p.quantity_in_stock), 0);
 
   const filteredProducts = products.filter(p => {
