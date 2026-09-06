@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 // ─── CREATE MULTI-PRODUCT STOCK RECEIPT ───────────────────────
 const createStockReceipt = async (req, res) => {
@@ -33,18 +34,19 @@ const createStockReceipt = async (req, res) => {
       }
     }
 
-    // Group uploaded files by item index
+    // Group uploaded files by item index and upload to Cloudinary
     // Files are uploaded as defect_images_0, defect_images_1, etc.
     const filesByIndex = {};
-    if (req.files) {
-      req.files.forEach(f => {
+    if (req.files && req.files.length > 0) {
+      await Promise.all(req.files.map(async (f) => {
         const match = f.fieldname.match(/defect_images_(\d+)/);
         if (match) {
           const idx = parseInt(match[1]);
           if (!filesByIndex[idx]) filesByIndex[idx] = [];
-          filesByIndex[idx].push(`/uploads/${f.filename}`);
+          const url = await uploadToCloudinary(f.buffer, f.originalname);
+          filesByIndex[idx].push(url);
         }
-      });
+      }));
     }
 
     // Create the receipt header
