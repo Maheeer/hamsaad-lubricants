@@ -194,11 +194,14 @@ export default function Orders() {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const downloadWaybill = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
     const BASE = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
     window.open(`${BASE}/api/pdf/waybill/${orderId}?token=${token}`, '_blank');
   };
+
+  // eslint-disable-next-line no-unused-vars
   const downloadInvoice = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
     const BASE = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
