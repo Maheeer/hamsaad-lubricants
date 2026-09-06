@@ -11,6 +11,7 @@ const isImageFile = (url) => {
   return /\.(jpg|jpeg|png|gif|webp)$/i.test(url.split('?')[0]);
 };
 
+// eslint-disable-next-line no-unused-vars
 const isPDFFile = (url) => {
   if (!url) return false;
   return url.includes('/raw/upload/') || /\.pdf$/i.test(url.split('?')[0]);
@@ -27,6 +28,7 @@ const getViewableUrl = (url) => {
 
 const DocumentViewerModal = ({ doc, onClose }) => {
   const [viewUrl, setViewUrl] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
