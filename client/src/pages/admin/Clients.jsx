@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import API from '../../utils/api';
 
 const formatNGN = (v) =>
@@ -78,9 +78,11 @@ export default function Clients() {
   const [receiptModal, setReceiptModal] = useState(null);
 
   // ── Load everything ───────────────────────────────────────────
-  const loadAll = useCallback(async (showSpinner = false) => {
+  useEffect(() => { loadAll(); }, []);
+
+  const loadAll = async () => {
     try {
-      if (showSpinner) setLoading(true);
+      setLoading(true);
       const [cRes, compRes, oRes, alertsRes, brandsRes, prodsRes] = await Promise.all([
         API.get('/users/clients'),
         API.get('/settings/complaints'),
@@ -100,13 +102,7 @@ export default function Clients() {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    loadAll(true);
-    const interval = setInterval(() => loadAll(false), 30000);
-    return () => clearInterval(interval);
-  }, [loadAll]);
+  };
 
   // ── Create client ─────────────────────────────────────────────
   const handleCreate = async () => {
@@ -117,7 +113,7 @@ export default function Clients() {
       await API.post('/users/clients', form);
       setShowCreate(false);
       setForm({ full_name: '', email: '', phone: '', address: '', credit_terms: '', status: 'active' });
-      await loadAll(true);
+      await loadAll();
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create client.');
     } finally {
@@ -131,7 +127,7 @@ export default function Clients() {
     try {
       setConfirmingId(id);
       await API.patch(`/users/clients/${id}/confirm`);
-      await loadAll(true);
+      await loadAll();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to confirm client.');
     } finally {
@@ -144,7 +140,7 @@ export default function Clients() {
     if (!window.confirm(`${isActive ? 'Disable' : 'Enable'} this client?`)) return;
     try {
       await API.patch(`/users/clients/${id}/toggle`);
-      await loadAll(true);
+      await loadAll();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update client.');
     }
@@ -166,7 +162,7 @@ export default function Clients() {
     if (!window.confirm('Approve this payment and mark invoice as PAID?')) return;
     try {
       await API.post(`/settings/approve-payment/${orderId}`);
-      await loadAll(true);
+      await loadAll();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve payment.');
     }
@@ -182,26 +178,11 @@ export default function Clients() {
         message: text,
         status:  replyStatus[complaintId] || 'in_progress',
       });
-      // Optimistically add message to UI immediately
-      const newMsg = {
-        id: Date.now(),
-        complaint_id: complaintId,
-        sender_type: 'admin',
-        sender_name: 'Support Team',
-        message: text,
-        created_at: new Date().toISOString(),
-      };
-      setComplaints((prev) => prev.map((c) =>
-        c.id === complaintId
-          ? { ...c, messages: [...(c.messages || []), newMsg], status: replyStatus[complaintId] || 'in_progress' }
-          : c
-      ));
       setReplyText((prev) => ({ ...prev, [complaintId]: '' }));
+      await loadAll();
       setTimeout(() => {
         bottomRefs.current[complaintId]?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      // Then refresh in background to get server-accurate data
-      loadAll(false);
+      }, 300);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to send reply.');
     } finally {
@@ -233,7 +214,7 @@ export default function Clients() {
       setAlertForm({ alert_type: 'brand', brand_name: '', products: [{ product_id: '', name: '', direction: 'increase' }], target: 'all', client_ids: [] });
       setShowAlertForm(false);
       setOpenSections((prev) => ({ ...prev, alerts: true }));
-      await loadAll(true);
+      await loadAll();
     } catch (err) {
       setAlertMsg(err.response?.data?.message || 'Failed to send alert.');
     } finally {
@@ -516,7 +497,7 @@ export default function Clients() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
               {order.payment_receipt_url ? (
-                <button onClick={() => setReceiptModal(`http://localhost:5000${order.payment_receipt_url}`)}
+                <button onClick={() => setReceiptModal(`${process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app'}${order.payment_receipt_url}`)}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#2E75B6', color: '#fff', padding: '7px 14px', borderRadius: '6px', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer' }}>
                   📄 View Receipt
                 </button>

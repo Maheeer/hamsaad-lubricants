@@ -551,15 +551,19 @@ const ReceiptDetailModal = ({ receipt, items, onClose }) => {
 
                     {item.defect_images && item.defect_images.length > 0 && (
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {item.defect_images.map((url, j) => (
-                          <a key={j} href={`http://localhost:5000${url}`} target="_blank" rel="noreferrer">
+                        {item.defect_images.map((url, j) => {
+                          const BASE = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
+                          const imgUrl = url.startsWith('http') ? url : `${BASE}${url}`;
+                          return (
+                          <a key={j} href={imgUrl} target="_blank" rel="noreferrer">
                             <img
-                              src={`http://localhost:5000${url}`}
+                              src={imgUrl}
                               alt={`defect-${j + 1}`}
                               style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '6px', border: '2px solid #fecaca', cursor: 'pointer' }}
                             />
                           </a>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

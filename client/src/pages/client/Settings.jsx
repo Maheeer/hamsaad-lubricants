@@ -223,7 +223,7 @@ export default function Settings() {
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     {order.payment_receipt_url && (
                       <a
-                        href={`http://localhost:5000${order.payment_receipt_url}`}
+                        href={`${process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app'}${order.payment_receipt_url}`}
                         target="_blank"
                         rel="noreferrer"
                         style={{ color: '#2E75B6', fontSize: '13px', fontWeight: 600 }}

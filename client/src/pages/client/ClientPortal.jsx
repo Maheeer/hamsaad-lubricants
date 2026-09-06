@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api/client' });
+const API = axios.create({ baseURL: `${process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app'}/api/client` });
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('hamsaad_client_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;

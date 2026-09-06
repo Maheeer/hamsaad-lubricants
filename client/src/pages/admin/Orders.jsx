@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import API from '../../utils/api';
-import DocumentViewerModal from '../../components/DocumentViewerModal';
 
 const statusColors = {
   created:   { background: '#FFF3CD', color: '#856404' },
@@ -46,7 +45,6 @@ export default function Orders() {
   const [adminReceiptUpload, setAdminReceiptUpload] = useState({ orderId: null, file: null, uploading: false });
   const [formError, setFormError] = useState('');
   const [creating, setCreating]   = useState(false);
-  const [docViewer, setDocViewer] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -176,7 +174,7 @@ export default function Orders() {
       setAdminReceiptUpload({ orderId: null, file: null, uploading: false });
       fetchOrders();
       const res = await API.get(`/orders/${orderId}`);
-        setSelectedOrder({ ...res.data.order, items: res.data.items || [], waybill: res.data.waybill || null });
+      setSelectedOrder({ ...res.data.order, items: res.data.items || [] });
       alert('Receipt uploaded and payment approved successfully.');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to upload receipt.');
@@ -187,23 +185,22 @@ export default function Orders() {
   const handleView = async (order) => {
     try {
       const res = await API.get(`/orders/${order.id}`);
-      setSelectedOrder({ ...res.data.order, items: res.data.items || [], waybill: res.data.waybill || null });
+      setSelectedOrder({ ...res.data.order, items: res.data.items || [] });
       setShowDetail(true);
     } catch {
       alert('Failed to load order details.');
     }
   };
-  
-  // eslint-disable-next-line no-unused-vars
+
   const downloadWaybill = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
-    window.open(`http://localhost:5000/api/pdf/waybill/${orderId}?token=${token}`, '_blank');
+    const BASE = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
+    window.open(`${BASE}/api/pdf/waybill/${orderId}?token=${token}`, '_blank');
   };
-
-  // eslint-disable-next-line no-unused-vars
   const downloadInvoice = (orderId) => {
     const token = localStorage.getItem('hamsaad_token');
-    window.open(`http://localhost:5000/api/pdf/invoice/${orderId}?token=${token}`, '_blank');
+    const BASE = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
+    window.open(`${BASE}/api/pdf/invoice/${orderId}?token=${token}`, '_blank');
   };
 
   const totals = calcTotals();
@@ -320,7 +317,8 @@ export default function Orders() {
                   <td>
                     <div style={{ display: 'flex', gap: '5px' }}>
                       <button className="btn-secondary" style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => handleView(order)}>View</button>
-                      
+                      <button className="btn-secondary" style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => downloadWaybill(order.id)}>📄 WB</button>
+                      <button className="btn-primary"   style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => downloadInvoice(order.id)}>🧾 INV</button>
                     </div>
                   </td>
                 </tr>
@@ -754,10 +752,8 @@ export default function Orders() {
                       <span style={{ fontSize: '12px', color: '#155724', background: '#d4edda', padding: '4px 10px', borderRadius: '4px' }}>
                         ✅ Receipt already uploaded
                       </span>
-                      <button onClick={() => setDocViewer({ url: selectedOrder.payment_receipt_url, title: 'Payment Receipt' })}
-                        style={{ fontSize: '12px', color: '#2E75B6', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                        👁 View
-                      </button>
+                      <a href={`${process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app'}${selectedOrder.payment_receipt_url}`} target="_blank" rel="noreferrer"
+                        style={{ fontSize: '12px', color: '#2E75B6', fontWeight: 600 }}>View</a>
                     </div>
                   ) : null}
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -785,19 +781,14 @@ export default function Orders() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                
-                <button className="btn-primary" onClick={() => {
-                  const token = localStorage.getItem('hamsaad_token');
-                  setDocViewer({ url: `/api/pdf/invoice/${selectedOrder.id}?token=${token}`, title: 'Invoice' });
-                }}>🧾 View Invoice</button>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button className="btn-secondary" onClick={() => downloadWaybill(selectedOrder.id)}>📄 Download Waybill</button>
+                <button className="btn-primary"   onClick={() => downloadInvoice(selectedOrder.id)}>🧾 Download Invoice</button>
               </div>
             </div>
           </div>
         </div>
       )}
-      {/* Document Viewer Modal */}
-      <DocumentViewerModal doc={docViewer} onClose={() => setDocViewer(null)} />
     </div>
   );
 }
