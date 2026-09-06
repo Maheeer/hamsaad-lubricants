@@ -17,9 +17,9 @@ const storage = new CloudinaryStorage({
     return {
       folder: 'hamsaad',
       resource_type: isImage ? 'image' : 'raw',
-      // Append extension to public_id so URL is self-describing
+      type: 'upload',
+      access_mode: 'public',
       public_id: isImage ? uniqueId : (isPDF ? `${uniqueId}.pdf` : uniqueId),
-      // Do not set format — let Cloudinary detect it
     };
   },
 });
