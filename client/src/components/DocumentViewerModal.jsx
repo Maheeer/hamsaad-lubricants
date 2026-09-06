@@ -131,7 +131,11 @@ const DocumentViewerModal = ({ doc, onClose }) => {
             isImage ? (
               <img src={viewUrl} alt={title} style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '4px' }} />
             ) : (
-              <iframe src={viewUrl} title={title} style={{ width: '100%', height: '65vh', border: 'none' }} />
+              <iframe
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(viewUrl)}&embedded=true`}
+                title={title}
+                style={{ width: '100%', height: '65vh', border: 'none' }}
+              />
             )
           ) : (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
