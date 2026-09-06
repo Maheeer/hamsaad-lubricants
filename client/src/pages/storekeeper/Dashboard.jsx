@@ -420,6 +420,7 @@ const ReleaseGoods = () => {
     setLoadingDetail(true);
     try {
       const res = await getOrderById(order.id);
+      console.log('Waybill data:', JSON.stringify(res.data.waybill));
       setOrderDetail(res.data || null);
     } catch { toast.error('Failed to load order details.'); }
     finally { setLoadingDetail(false); }
