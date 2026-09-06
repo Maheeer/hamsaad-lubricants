@@ -1,9 +1,17 @@
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const fs      = require('fs');
 require('dotenv').config();
 
 const app = express();
+
+// Create uploads folder if it doesn't exist
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('uploads/ folder created');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +35,6 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/stock-receipts', require('./routes/stockReceipts'));
 app.use('/api/manager-notifications', require('./routes/managerNotifications'));
 app.use('/api/storekeeper-notifications', require('./routes/storekeeperNotifications'));
-app.use('/api/pdf', require('./routes/pdf'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
