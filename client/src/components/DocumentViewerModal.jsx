@@ -5,21 +5,14 @@ const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-pr
 
 const isImageFile = (url) => {
   if (!url) return false;
-  // Cloudinary image URLs contain /image/upload/
   if (url.includes('/image/upload/')) return true;
-  // Local image files
   return /\.(jpg|jpeg|png|gif|webp)$/i.test(url.split('?')[0]);
 };
 
-// eslint-disable-next-line no-unused-vars
-const isPDFFile = (url) => {
-  if (!url) return false;
-  return url.includes('/raw/upload/') || /\.pdf$/i.test(url.split('?')[0]);
-};
+const isCloudinaryUrl = (url) => url && url.startsWith('http') && url.includes('cloudinary.com');
 
 const getViewableUrl = (url) => {
   if (!url) return url;
-  // For raw Cloudinary uploads that are PDFs, append .pdf if missing
   if (url.includes('/raw/upload/') && !url.endsWith('.pdf')) {
     return url + '.pdf';
   }
@@ -27,32 +20,31 @@ const getViewableUrl = (url) => {
 };
 
 const DocumentViewerModal = ({ doc, onClose }) => {
-  const [viewUrl, setViewUrl] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [blobUrl, setBlobUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [viewUrl, setViewUrl]   = useState(null);
+  const [loading, setLoading]   = useState(true);
+  const [useGoogleViewer, setUseGoogleViewer] = useState(false);
 
   useEffect(() => {
-    if (!doc) return;
+    if (!doc?.url) return;
     let objectUrl = null;
 
     const fetchDoc = async () => {
       setLoading(true);
       setViewUrl(null);
-      setBlobUrl(null);
-      try {
-        const isCloudinary = doc.url.startsWith('http');
+      setUseGoogleViewer(false);
 
-        if (isCloudinary) {
-          // Use Cloudinary URL directly — public, no auth needed
+      try {
+        if (isCloudinaryUrl(doc.url)) {
+          // Cloudinary URLs — public, use Google Docs viewer for PDFs
           const url = getViewableUrl(doc.url);
           setViewUrl(url);
+          setUseGoogleViewer(!isImageFile(doc.url));
           setLoading(false);
           return;
         }
 
-        // Local/Railway URLs need auth token
-        const fullUrl = `${BASE_URL}${doc.url}`;
+        // Local/Railway URLs — fetch as blob with auth token
+        const fullUrl = doc.url.startsWith('http') ? doc.url : `${BASE_URL}${doc.url}`;
         const token = localStorage.getItem('hamsaad_token');
         const res = await fetch(fullUrl, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -61,7 +53,7 @@ const DocumentViewerModal = ({ doc, onClose }) => {
         const blob = await res.blob();
         objectUrl = URL.createObjectURL(blob);
         setViewUrl(objectUrl);
-        setBlobUrl(objectUrl);
+        setUseGoogleViewer(false); // blob URLs cannot use Google Docs viewer
       } catch {
         toast.error('Failed to load document.');
       } finally {
@@ -74,7 +66,7 @@ const DocumentViewerModal = ({ doc, onClose }) => {
     return () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [doc]);
+  }, [doc?.url]);
 
   if (!doc) return null;
 
@@ -89,8 +81,7 @@ const DocumentViewerModal = ({ doc, onClose }) => {
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = objectUrl;
-      const ext = isImage ? '.jpg' : '.pdf';
-      a.download = title.replace(/\s+/g, '_') + ext;
+      a.download = title.replace(/\s+/g, '_') + (isImage ? '.jpg' : '.pdf');
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -99,6 +90,10 @@ const DocumentViewerModal = ({ doc, onClose }) => {
       toast.error('Download failed. Please try again.');
     }
   };
+
+  const iframeSrc = useGoogleViewer
+    ? `https://docs.google.com/viewer?url=${encodeURIComponent(viewUrl)}&embedded=true`
+    : viewUrl;
 
   return (
     <div style={{
@@ -134,7 +129,8 @@ const DocumentViewerModal = ({ doc, onClose }) => {
               <img src={viewUrl} alt={title} style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '4px' }} />
             ) : (
               <iframe
-                src={`https://docs.google.com/viewer?url=${encodeURIComponent(viewUrl)}&embedded=true`}
+                key={viewUrl}
+                src={iframeSrc}
                 title={title}
                 style={{ width: '100%', height: '65vh', border: 'none' }}
               />
