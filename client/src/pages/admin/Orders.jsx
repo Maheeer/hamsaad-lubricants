@@ -319,8 +319,6 @@ export default function Orders() {
                   <td>
                     <div style={{ display: 'flex', gap: '5px' }}>
                       <button className="btn-secondary" style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => handleView(order)}>View</button>
-                      <button className="btn-secondary" style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => downloadWaybill(order.id)}>📄 WB</button>
-                      <button className="btn-primary"   style={{ fontSize: '11px', padding: '4px 10px' }} onClick={() => downloadInvoice(order.id)}>🧾 INV</button>
                     </div>
                   </td>
                 </tr>
