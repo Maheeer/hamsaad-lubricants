@@ -4,6 +4,15 @@ import { toast } from 'react-toastify';
 const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
 const isImageFile = (url) => /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split('?')[0] || '');
 
+// Fix Cloudinary raw PDF URLs to be viewable in browser
+const getViewableUrl = (url) => {
+  if (!url) return url;
+  if (url.includes('/raw/upload/') && !url.endsWith('.pdf')) {
+    return url + '.pdf';
+  }
+  return url;
+};
+
 const DocumentViewerModal = ({ doc, onClose }) => {
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +26,8 @@ const DocumentViewerModal = ({ doc, onClose }) => {
       setBlobUrl(null);
       try {
         const isCloudinary = doc.url.startsWith('http');
-        const fullUrl = isCloudinary ? doc.url : `${BASE_URL}${doc.url}`;
+        const rawUrl = isCloudinary ? doc.url : `${BASE_URL}${doc.url}`;
+        const fullUrl = getViewableUrl(rawUrl);
 
         if (isCloudinary) {
           // Cloudinary URLs are public — use directly without auth
