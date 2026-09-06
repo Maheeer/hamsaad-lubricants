@@ -1,8 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
-const path     = require('path');
 const pool     = require('../config/db');
-const { upload } = require('../config/cloudinary');
+const { upload, uploadToCloudinary } = require('../config/cloudinary');
 const {
   createOrder,
   getAllOrders,
@@ -44,7 +43,7 @@ router.post('/:id/upload-delivery-note', adminOrManager, upload.single('file'), 
     const { id } = req.params;
     if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
-    const fileUrl = req.file.path || req.file.secure_url;
+    const fileUrl = await uploadToCloudinary(req.file.buffer, req.file.originalname);
 
     await pool.query(
       `UPDATE waybills SET delivery_note_url = $1, updated_at = NOW() WHERE order_id = $2`,
@@ -64,7 +63,7 @@ router.post('/:id/upload-signed-delivery-note', adminManagerOrStorekeeper, uploa
     const { id } = req.params;
     if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
-    const fileUrl = req.file.path || req.file.secure_url;
+    const fileUrl = await uploadToCloudinary(req.file.buffer, req.file.originalname);
 
     await pool.query(
       `UPDATE waybills SET signed_delivery_note_url = $1, updated_at = NOW() WHERE order_id = $2`,

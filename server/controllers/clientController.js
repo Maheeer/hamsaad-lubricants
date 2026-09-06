@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 // ─── GET PRODUCTS (with selling_price for cart total calc) ────
 const getClientProducts = async (req, res) => {
@@ -211,7 +212,7 @@ const uploadPaymentReceipt = async (req, res) => {
       return res.status(404).json({ message: 'Order not found.' });
     }
 
-    const filePath = req.file.path || req.file.secure_url;
+    const filePath = await uploadToCloudinary(req.file.buffer, req.file.originalname);
     await pool.query(
       `UPDATE invoices
        SET payment_receipt_url = $1, receipt_uploaded_at = NOW(),

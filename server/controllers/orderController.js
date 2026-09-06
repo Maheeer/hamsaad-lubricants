@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 // ─── GENERATE ORDER NUMBER ────────────────────────────────────
 const generateOrderNumber = async () => {
@@ -358,7 +359,7 @@ const uploadScannedWaybill = async (req, res) => {
       return res.status(400).json({ message: 'Order must be confirmed before uploading waybill.' });
     }
 
-    const filePath = req.file.path || req.file.secure_url;
+    const filePath = await uploadToCloudinary(req.file.buffer, req.file.originalname);
     await pool.query(
       `UPDATE waybills SET scanned_copy_url = $1, updated_at = NOW() WHERE order_id = $2`,
       [filePath, id]
@@ -474,7 +475,7 @@ const uploadSignedWaybill = async (req, res) => {
       return res.status(400).json({ message: 'Order must be released before uploading signed waybill.' });
     }
 
-    const filePath = req.file.path || req.file.secure_url;
+    const filePath = await uploadToCloudinary(req.file.buffer, req.file.originalname);
     await pool.query(
       `UPDATE waybills SET signed_copy_url = $1, updated_at = NOW() WHERE order_id = $2`,
       [filePath, id]
@@ -549,7 +550,7 @@ const adminUploadReceipt = async (req, res) => {
     }
 
     const order    = orderRes.rows[0];
-    const filePath = req.file.path || req.file.secure_url;
+    const filePath = await uploadToCloudinary(req.file.buffer, req.file.originalname);
 
     await pool.query(
       `UPDATE invoices SET payment_receipt_url = $1, updated_at = NOW() WHERE order_id = $2`,
