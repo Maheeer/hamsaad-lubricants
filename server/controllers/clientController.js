@@ -211,7 +211,7 @@ const uploadPaymentReceipt = async (req, res) => {
       return res.status(404).json({ message: 'Order not found.' });
     }
 
-    const filePath = `/uploads/${req.file.filename}`;
+    const filePath = req.file.path || req.file.secure_url;
     await pool.query(
       `UPDATE invoices
        SET payment_receipt_url = $1, receipt_uploaded_at = NOW(),

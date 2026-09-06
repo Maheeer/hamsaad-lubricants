@@ -1,8 +1,8 @@
 const express  = require('express');
 const router   = express.Router();
-const multer   = require('multer');
 const path     = require('path');
 const pool     = require('../config/db');
+const { upload } = require('../config/cloudinary');
 const {
   createOrder,
   getAllOrders,
@@ -22,23 +22,6 @@ const {
   adminOrManager,
   adminManagerOrStorekeeper,
 } = require('../middleware/auth');
-
-// ── Multer ────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename:    (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, unique + path.extname(file.originalname));
-  },
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|pdf/;
-    cb(null, allowed.test(path.extname(file.originalname).toLowerCase()));
-  },
-});
 
 router.use(verifyToken);
 
@@ -61,7 +44,7 @@ router.post('/:id/upload-delivery-note', adminOrManager, upload.single('file'), 
     const { id } = req.params;
     if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
-    const fileUrl = '/uploads/' + req.file.filename;
+    const fileUrl = req.file.path || req.file.secure_url;
 
     await pool.query(
       `UPDATE waybills SET delivery_note_url = $1, updated_at = NOW() WHERE order_id = $2`,
@@ -81,7 +64,7 @@ router.post('/:id/upload-signed-delivery-note', adminManagerOrStorekeeper, uploa
     const { id } = req.params;
     if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
 
-    const fileUrl = '/uploads/' + req.file.filename;
+    const fileUrl = req.file.path || req.file.secure_url;
 
     await pool.query(
       `UPDATE waybills SET signed_delivery_note_url = $1, updated_at = NOW() WHERE order_id = $2`,

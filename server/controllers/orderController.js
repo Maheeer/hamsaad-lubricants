@@ -262,12 +262,11 @@ const getOrderById = async (req, res) => {
 
     const order = orderResult.rows[0];
 
-    // Fetch order items (includes current stock for storekeeper availability check)
+    // Fetch order items
     const itemsResult = await pool.query(
       `SELECT oi.*,
               COALESCE(oi.product_name, p.name) AS product_name,
               p.size_variant, p.unit,
-              p.quantity_in_stock, p.minimum_threshold,
               b.name AS brand_name
        FROM order_items oi
        LEFT JOIN products p ON oi.product_id = p.id
@@ -323,11 +322,10 @@ const confirmOrder = async (req, res) => {
       'SELECT id FROM waybills WHERE order_id = $1', [id]
     );
     if (existingWaybill.rows.length === 0) {
-      const { collector_name } = req.body;
       await pool.query(
-        `INSERT INTO waybills (order_id, waybill_number, created_by, collector_name)
-        VALUES ($1, $2, $3, $4)`,
-        [id, order.rows[0].order_number, req.user.id, collector_name || null]
+        `INSERT INTO waybills (order_id, waybill_number, created_by)
+         VALUES ($1, $2, $3)`,
+        [id, order.rows[0].order_number, req.user.id]
       );
     }
 
@@ -360,7 +358,7 @@ const uploadScannedWaybill = async (req, res) => {
       return res.status(400).json({ message: 'Order must be confirmed before uploading waybill.' });
     }
 
-    const filePath = `/uploads/${req.file.filename}`;
+    const filePath = req.file.path || req.file.secure_url;
     await pool.query(
       `UPDATE waybills SET scanned_copy_url = $1, updated_at = NOW() WHERE order_id = $2`,
       [filePath, id]
@@ -476,7 +474,7 @@ const uploadSignedWaybill = async (req, res) => {
       return res.status(400).json({ message: 'Order must be released before uploading signed waybill.' });
     }
 
-    const filePath = `/uploads/${req.file.filename}`;
+    const filePath = req.file.path || req.file.secure_url;
     await pool.query(
       `UPDATE waybills SET signed_copy_url = $1, updated_at = NOW() WHERE order_id = $2`,
       [filePath, id]
@@ -551,7 +549,7 @@ const adminUploadReceipt = async (req, res) => {
     }
 
     const order    = orderRes.rows[0];
-    const filePath = `/uploads/${req.file.filename}`;
+    const filePath = req.file.path || req.file.secure_url;
 
     await pool.query(
       `UPDATE invoices SET payment_receipt_url = $1, updated_at = NOW() WHERE order_id = $2`,
