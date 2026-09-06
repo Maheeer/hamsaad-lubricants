@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
+
 export default function ClientLogin({ onLogin }) {
   const [form, setForm]     = useState({ client_id: '', password: '' });
   const [error, setError]   = useState('');
@@ -13,7 +15,7 @@ export default function ClientLogin({ onLogin }) {
     }
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:5000/api/client/login', form);
+      const res = await axios.post(`${BASE_URL}/api/client/login`, form);
       localStorage.setItem('hamsaad_client_token', res.data.token);
       localStorage.setItem('hamsaad_client', JSON.stringify(res.data.client));
       onLogin(res.data.client);
