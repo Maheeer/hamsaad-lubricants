@@ -16,7 +16,17 @@ const DocumentViewerModal = ({ doc, onClose }) => {
       setLoading(true);
       setBlobUrl(null);
       try {
-        const fullUrl = doc.url.startsWith('http') ? doc.url : `${BASE_URL}${doc.url}`;
+        const isCloudinary = doc.url.startsWith('http');
+        const fullUrl = isCloudinary ? doc.url : `${BASE_URL}${doc.url}`;
+
+        if (isCloudinary) {
+          // Cloudinary URLs are public — use directly without auth
+          setBlobUrl(fullUrl);
+          setLoading(false);
+          return;
+        }
+
+        // Local/Railway URLs need auth token
         const token = localStorage.getItem('hamsaad_token');
         const res = await fetch(fullUrl, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -44,14 +54,22 @@ const DocumentViewerModal = ({ doc, onClose }) => {
   const isImage = isImageFile(doc.url);
   const { title } = doc;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!blobUrl) return;
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = title.replace(/\s+/g, '_') + (isImage ? '.jpg' : '.pdf');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      const res = await fetch(blobUrl);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = title.replace(/\s+/g, '_') + (isImage ? '.jpg' : '.pdf');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      toast.error('Download failed. Please try again.');
+    }
   };
 
   return (
