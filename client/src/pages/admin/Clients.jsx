@@ -498,7 +498,7 @@ export default function Clients() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
               {order.payment_receipt_url ? (
-                <button onClick={() => setReceiptModal(`${process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app'}${order.payment_receipt_url}`)}
+                <button onClick={() => setReceiptModal(order.payment_receipt_url)}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#2E75B6', color: '#fff', padding: '7px 14px', borderRadius: '6px', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer' }}>
                   📄 View Receipt
                 </button>
