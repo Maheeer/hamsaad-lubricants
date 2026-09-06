@@ -13,11 +13,13 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => {
     const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.originalname);
     const isPDF   = /\.pdf$/i.test(file.originalname);
+    const uniqueId = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     return {
       folder: 'hamsaad',
       resource_type: isImage ? 'image' : 'raw',
-      format: isPDF ? 'pdf' : undefined,
-      public_id: `${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+      // Append extension to public_id so URL is self-describing
+      public_id: isImage ? uniqueId : (isPDF ? `${uniqueId}.pdf` : uniqueId),
+      // Do not set format — let Cloudinary detect it
     };
   },
 });
@@ -27,14 +29,4 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// Helper to get viewable URL from Cloudinary URL
-const getViewableUrl = (url) => {
-  if (!url) return url;
-  // For raw PDFs, ensure the URL ends with .pdf for proper rendering
-  if (url.includes('/raw/upload/') && !url.endsWith('.pdf')) {
-    return url + '.pdf';
-  }
-  return url;
-};
-
-module.exports = { upload, cloudinary, getViewableUrl };
+module.exports = { upload, cloudinary };

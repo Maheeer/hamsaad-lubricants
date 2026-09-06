@@ -2,11 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
-const isImageFile = (url) => /\.(jpg|jpeg|png|gif|webp)$/i.test(url?.split('?')[0] || '');
 
-// Fix Cloudinary raw PDF URLs to be viewable in browser
+const isImageFile = (url) => {
+  if (!url) return false;
+  // Cloudinary image URLs contain /image/upload/
+  if (url.includes('/image/upload/')) return true;
+  // Local image files
+  return /\.(jpg|jpeg|png|gif|webp)$/i.test(url.split('?')[0]);
+};
+
+const isPDFFile = (url) => {
+  if (!url) return false;
+  return url.includes('/raw/upload/') || /\.pdf$/i.test(url.split('?')[0]);
+};
+
 const getViewableUrl = (url) => {
   if (!url) return url;
+  // For raw Cloudinary uploads that are PDFs, append .pdf if missing
   if (url.includes('/raw/upload/') && !url.endsWith('.pdf')) {
     return url + '.pdf';
   }
@@ -14,29 +26,31 @@ const getViewableUrl = (url) => {
 };
 
 const DocumentViewerModal = ({ doc, onClose }) => {
+  const [viewUrl, setViewUrl] = useState(null);
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!doc) return;
-
     let objectUrl = null;
+
     const fetchDoc = async () => {
       setLoading(true);
+      setViewUrl(null);
       setBlobUrl(null);
       try {
         const isCloudinary = doc.url.startsWith('http');
-        const rawUrl = isCloudinary ? doc.url : `${BASE_URL}${doc.url}`;
-        const fullUrl = getViewableUrl(rawUrl);
 
         if (isCloudinary) {
-          // Cloudinary URLs are public — use directly without auth
-          setBlobUrl(fullUrl);
+          // Use Cloudinary URL directly — public, no auth needed
+          const url = getViewableUrl(doc.url);
+          setViewUrl(url);
           setLoading(false);
           return;
         }
 
         // Local/Railway URLs need auth token
+        const fullUrl = `${BASE_URL}${doc.url}`;
         const token = localStorage.getItem('hamsaad_token');
         const res = await fetch(fullUrl, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -44,6 +58,7 @@ const DocumentViewerModal = ({ doc, onClose }) => {
         if (!res.ok) throw new Error('Failed to load document');
         const blob = await res.blob();
         objectUrl = URL.createObjectURL(blob);
+        setViewUrl(objectUrl);
         setBlobUrl(objectUrl);
       } catch {
         toast.error('Failed to load document.');
@@ -65,14 +80,15 @@ const DocumentViewerModal = ({ doc, onClose }) => {
   const { title } = doc;
 
   const handleDownload = async () => {
-    if (!blobUrl) return;
+    if (!viewUrl) return;
     try {
-      const res = await fetch(blobUrl);
+      const res = await fetch(viewUrl);
       const blob = await res.blob();
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = objectUrl;
-      a.download = title.replace(/\s+/g, '_') + (isImage ? '.jpg' : '.pdf');
+      const ext = isImage ? '.jpg' : '.pdf';
+      a.download = title.replace(/\s+/g, '_') + ext;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -111,11 +127,11 @@ const DocumentViewerModal = ({ doc, onClose }) => {
               <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
               <span style={{ fontSize: '13px' }}>Loading document...</span>
             </div>
-          ) : blobUrl ? (
+          ) : viewUrl ? (
             isImage ? (
-              <img src={blobUrl} alt={title} style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '4px' }} />
+              <img src={viewUrl} alt={title} style={{ maxWidth: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '4px' }} />
             ) : (
-              <iframe src={blobUrl} title={title} style={{ width: '100%', height: '65vh', border: 'none' }} />
+              <iframe src={viewUrl} title={title} style={{ width: '100%', height: '65vh', border: 'none' }} />
             )
           ) : (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
@@ -133,8 +149,8 @@ const DocumentViewerModal = ({ doc, onClose }) => {
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               onClick={handleDownload}
-              disabled={!blobUrl}
-              style={{ background: blobUrl ? '#1F3864' : '#9ca3af', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 18px', fontSize: '13px', fontWeight: '700', cursor: blobUrl ? 'pointer' : 'not-allowed' }}
+              disabled={!viewUrl}
+              style={{ background: viewUrl ? '#1F3864' : '#9ca3af', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 18px', fontSize: '13px', fontWeight: '700', cursor: viewUrl ? 'pointer' : 'not-allowed' }}
             >
               ⬇️ Download
             </button>
