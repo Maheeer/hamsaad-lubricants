@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import API from '../../utils/api';
+import DocumentViewerModal from '../../components/DocumentViewerModal';
 
 const formatNGN = (v) =>
   `NGN ${parseFloat(v || 0).toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
@@ -763,31 +764,10 @@ export default function Clients() {
       </Section>
 
       {/* ── RECEIPT MODAL ─────────────────────────────────────── */}
-      {receiptModal && (
-        <div onClick={() => setReceiptModal(null)} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '24px', boxSizing: 'border-box' }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: '#fff', borderRadius: '10px', overflow: 'hidden', maxWidth: '700px', width: '100%', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ background: '#1F3864', color: '#fff', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '15px' }}>Payment Receipt</span>
-              <button onClick={() => setReceiptModal(null)} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-            </div>
-            <div style={{ flex: 1, overflow: 'auto', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa' }}>
-              {receiptModal.toLowerCase().endsWith('.pdf') ? (
-                <iframe src={receiptModal} style={{ width: '100%', height: '70vh', border: 'none' }} title="Receipt" />
-              ) : (
-                <img src={receiptModal} alt="Payment Receipt" style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: '6px' }} />
-              )}
-            </div>
-            <div style={{ padding: '12px 20px', borderTop: '1px solid #dee2e6', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <a href={receiptModal} target="_blank" rel="noreferrer" style={{ color: '#2E75B6', fontSize: '13px', fontWeight: 600, padding: '8px 16px', border: '1px solid #2E75B6', borderRadius: '6px', textDecoration: 'none' }}>
-                Open in New Tab
-              </a>
-              <button onClick={() => setReceiptModal(null)} style={{ background: '#1F3864', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px 20px', cursor: 'pointer', fontWeight: 700, fontSize: '13px' }}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DocumentViewerModal
+        doc={receiptModal ? { url: receiptModal, title: 'Payment Receipt' } : null}
+        onClose={() => setReceiptModal(null)}
+      />
     </div>
   );
 }
