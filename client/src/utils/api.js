@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
-
 const API = axios.create({
-  baseURL: `${BASE_URL}/api`,
+  baseURL: 'http://localhost:5000/api',
+ // baseURL: 'http://10.239.70.118:5000/api'
 });
 
 // Automatically attach token to every request
@@ -36,7 +35,7 @@ export const changePassword = (data) => API.put('/auth/change-password', data);
 // ─── USERS ───────────────────────────────────────────────────
 export const getAllUsers = () => API.get('/users');
 export const createUser = (data) => API.post('/users', data);
-export const toggleUserAccess = (id) => API.patch(`/users/${id}/toggle-access`);
+export const toggleUserAccess = (id) => API.patch(`/users/${id}/toggle`);
 export const resetUserPassword = (id, data) => API.patch(`/users/${id}/reset-password`, data);
 
 // ─── CLIENTS ─────────────────────────────────────────────────
@@ -84,9 +83,9 @@ export const uploadSignedWaybill = (id, file) => {
 };
 
 export const downloadWaybillPDF = (orderId) =>
-  window.open(`${BASE_URL}/api/pdf/waybill/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
+  window.open(`http://localhost:5000/api/pdf/waybill/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
 
 export const downloadInvoicePDF = (orderId) =>
-  window.open(`${BASE_URL}/api/pdf/invoice/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
+  window.open(`http://localhost:5000/api/pdf/invoice/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
 
 export default API;
