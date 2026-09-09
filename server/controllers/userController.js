@@ -64,7 +64,7 @@ const createUser = async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO users (full_name, email, password_hash, role, access_code)
+      `INSERT INTO users (full_name, email, password, role, access_code)
        VALUES ($1,$2,$3,$4,$5) RETURNING id, full_name, email, role, access_code, is_active, created_at`,
       [full_name, email, hash, role, accessCode]
     );
@@ -120,7 +120,7 @@ const resetUserPassword = async (req, res) => {
     }
     const hash = await bcrypt.hash(new_password, 10);
     await pool.query(
-      'UPDATE users SET password_hash = $1 WHERE id = $2', [hash, id]
+      'UPDATE users SET password = $1 WHERE id = $2', [hash, id]
     );
     res.json({ message: 'Password reset successfully.' });
   } catch (err) {

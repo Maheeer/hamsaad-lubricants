@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import API from '../../utils/api';
 import DocumentViewerModal from '../../components/DocumentViewerModal';
 
@@ -79,11 +79,9 @@ export default function Clients() {
   const [receiptModal, setReceiptModal] = useState(null);
 
   // ── Load everything ───────────────────────────────────────────
-  useEffect(() => { loadAll(); }, []);
-
-  const loadAll = async () => {
+  const loadAll = useCallback(async (showSpinner = false) => {
     try {
-      setLoading(true);
+      if (showSpinner) setLoading(true);
       const [cRes, compRes, oRes, alertsRes, brandsRes, prodsRes] = await Promise.all([
         API.get('/users/clients'),
         API.get('/settings/complaints'),
@@ -103,7 +101,13 @@ export default function Clients() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadAll(true);
+    const interval = setInterval(() => loadAll(false), 30000);
+    return () => clearInterval(interval);
+  }, [loadAll]);
 
   // ── Create client ─────────────────────────────────────────────
   const handleCreate = async () => {
@@ -114,7 +118,7 @@ export default function Clients() {
       await API.post('/users/clients', form);
       setShowCreate(false);
       setForm({ full_name: '', email: '', phone: '', address: '', credit_terms: '', status: 'active' });
-      await loadAll();
+      await loadAll(true);
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create client.');
     } finally {
@@ -128,7 +132,7 @@ export default function Clients() {
     try {
       setConfirmingId(id);
       await API.patch(`/users/clients/${id}/confirm`);
-      await loadAll();
+      await loadAll(true);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to confirm client.');
     } finally {
@@ -141,7 +145,7 @@ export default function Clients() {
     if (!window.confirm(`${isActive ? 'Disable' : 'Enable'} this client?`)) return;
     try {
       await API.patch(`/users/clients/${id}/toggle`);
-      await loadAll();
+      await loadAll(true);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update client.');
     }
@@ -163,7 +167,7 @@ export default function Clients() {
     if (!window.confirm('Approve this payment and mark invoice as PAID?')) return;
     try {
       await API.post(`/settings/approve-payment/${orderId}`);
-      await loadAll();
+      await loadAll(true);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve payment.');
     }
@@ -180,7 +184,7 @@ export default function Clients() {
         status:  replyStatus[complaintId] || 'in_progress',
       });
       setReplyText((prev) => ({ ...prev, [complaintId]: '' }));
-      await loadAll();
+      await loadAll(true);
       setTimeout(() => {
         bottomRefs.current[complaintId]?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
@@ -215,7 +219,7 @@ export default function Clients() {
       setAlertForm({ alert_type: 'brand', brand_name: '', products: [{ product_id: '', name: '', direction: 'increase' }], target: 'all', client_ids: [] });
       setShowAlertForm(false);
       setOpenSections((prev) => ({ ...prev, alerts: true }));
-      await loadAll();
+      await loadAll(true);
     } catch (err) {
       setAlertMsg(err.response?.data?.message || 'Failed to send alert.');
     } finally {
