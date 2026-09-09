@@ -101,7 +101,7 @@ const toggleUserAccess = async (req, res) => {
       [req.user.id, req.user.full_name,
        newStatus ? 'ENABLE_USER' : 'DISABLE_USER', 'users',
        id, JSON.stringify({ is_active: newStatus, target_name: user.rows[0].full_name })]
-    );
+    ).catch(() => {}); // Don't fail if audit log fails
 
     res.json({ message: `User ${newStatus ? 'enabled' : 'disabled'} successfully.` });
   } catch (err) {
