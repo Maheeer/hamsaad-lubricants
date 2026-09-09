@@ -1,8 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://hamsaad-lubricants-production.up.railway.app';
+
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
- // baseURL: 'http://10.239.70.118:5000/api'
+  baseURL: `${BASE_URL}/api`,
 });
 
 // Automatically attach token to every request
@@ -83,9 +84,9 @@ export const uploadSignedWaybill = (id, file) => {
 };
 
 export const downloadWaybillPDF = (orderId) =>
-  window.open(`http://localhost:5000/api/pdf/waybill/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
+  window.open(`${BASE_URL}/api/pdf/waybill/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
 
 export const downloadInvoicePDF = (orderId) =>
-  window.open(`http://localhost:5000/api/pdf/invoice/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
+  window.open(`${BASE_URL}/api/pdf/invoice/${orderId}?token=${localStorage.getItem('hamsaad_token')}`, '_blank');
 
 export default API;
