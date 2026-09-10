@@ -4,6 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
+// PWA components
+import PWAInstallBanner from './components/PWAInstallBanner';
+import OfflineBar       from './components/OfflineBar';
+
 // Pages
 import Login               from './pages/Login';
 import AdminDashboard      from './pages/admin/Dashboard';
@@ -66,7 +70,7 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
-      {/* Client portal — no auth guard, handles its own auth */}
+      {/* Client portal */}
       <Route path="/client/*" element={<ClientApp />} />
 
       <Route path="/" element={
@@ -82,7 +86,14 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        {/* PWA offline indicator */}
+        <OfflineBar />
+
         <AppRoutes />
+
+        {/* PWA install prompt */}
+        <PWAInstallBanner />
+
         <ToastContainer
           position="top-right"
           autoClose={3000}

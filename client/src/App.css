@@ -1,38 +1,61 @@
-.App {
-  text-align: center;
-}
+/* ─── Global responsive overrides ─────────────────────────── */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Stat card grids (used in all dashboards) */
+.stat-grid-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
-.App-link {
-  color: #61dafb;
+.stat-grid-row > * {
+  flex: 1 1 160px;
+  min-width: 140px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Dashboard page containers */
+.dashboard-page {
+  padding: 16px;
+  background: #f5f6fa;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  .dashboard-page { padding: 24px 28px; }
+}
+
+/* Two-column layout for charts + tables */
+.dashboard-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-row .col-wide  { flex: 2; min-width: 280px; }
+.dashboard-row .col-narrow { flex: 1; min-width: 240px; }
+
+/* Recent orders table wrapper */
+.recent-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+}
+
+/* Mobile-specific: stack two-col layout */
+@media (max-width: 599px) {
+  .stat-grid-row > * {
+    flex: 1 1 calc(50% - 7px);
+    min-width: 0;
   }
-  to {
-    transform: rotate(360deg);
+
+  .dashboard-row {
+    flex-direction: column;
+  }
+
+  .dashboard-row .col-wide,
+  .dashboard-row .col-narrow {
+    width: 100%;
+    min-width: 0;
   }
 }
