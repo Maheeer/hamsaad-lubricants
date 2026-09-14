@@ -78,7 +78,8 @@ const Users = () => {
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table style={{ minWidth: 640 }}>
           <thead>
             <tr>
               <th>Full Name</th>
@@ -136,6 +137,7 @@ const Users = () => {
             ))}
           </tbody>
         </table>
+        </div>{/* end scroll wrapper */}
       </div>
 
       {/* Create User Modal */}

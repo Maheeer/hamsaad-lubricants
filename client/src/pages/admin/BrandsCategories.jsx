@@ -449,7 +449,8 @@ const BrandsCategories = () => {
         </div>
 
         {/* Table */}
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 520 }}>
           <thead>
             <tr>
               {['Name', 'Description', 'Products', 'Status', 'Actions'].map((h) => (
@@ -489,6 +490,7 @@ const BrandsCategories = () => {
             )}
           </tbody>
         </table>
+        </div>{/* end scroll wrapper */}
 
         {/* Legend */}
         <div style={{

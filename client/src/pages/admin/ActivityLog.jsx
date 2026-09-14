@@ -189,12 +189,14 @@ export default function ActivityLog() {
         <div>
           <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase', marginBottom: '5px' }}>From</label>
           <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
-            style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px' }} />
+            placeholder="DD/MM/YYYY"
+            style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', colorScheme: 'light' }} />
         </div>
         <div>
           <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase', marginBottom: '5px' }}>To</label>
           <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
-            style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px' }} />
+            placeholder="DD/MM/YYYY"
+            style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', colorScheme: 'light' }} />
         </div>
         {(fromDate || toDate || filter !== 'all') && (
           <button

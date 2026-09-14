@@ -5,10 +5,14 @@
 
 /* ── Root & Layout ─────────────────────────────────────────── */
 .rp-root {
-  padding: 28px 32px;
+  padding: 16px;
   background: #f5f6fa;
-  min-height: 100vh;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  min-height: 100%;
+  font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@media (min-width: 768px) {
+  .rp-root { padding: 28px 32px; }
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -16,7 +20,9 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .rp-title {
@@ -58,28 +64,36 @@
 /* ── Section Toggle ─────────────────────────────────────────── */
 .rp-section-toggle {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   margin-bottom: 24px;
   background: #fff;
   border: 1px solid #e5eaf3;
   border-radius: 12px;
   padding: 6px;
-  width: fit-content;
+  /* scroll on mobile instead of wrapping or overflowing */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: nowrap;
 }
 
 .rp-toggle-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
+  gap: 6px;
+  padding: 9px 16px;
   border-radius: 8px;
   border: none;
   background: transparent;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.18s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .rp-toggle-btn.active {
@@ -147,22 +161,28 @@
   gap: 0;
   border-bottom: 2px solid #e5eaf3;
   margin-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
 }
 
 .rp-tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
+  gap: 6px;
+  padding: 11px 16px;
   border: none;
   background: transparent;
   color: #6b7280;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .rp-tab:hover:not(.active) {

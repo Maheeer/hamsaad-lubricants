@@ -256,9 +256,11 @@ export default function Orders() {
           <option value="paid">Paid</option>
         </select>
         <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}
-          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px' }} />
+          placeholder="From date"
+          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
         <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)}
-          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px' }} />
+          placeholder="To date"
+          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
         <button className="btn-secondary" onClick={fetchOrders}>Filter</button>
         <button className="btn-secondary" onClick={() => { setFilterStatus(''); setFilterFrom(''); setFilterTo(''); setFilterPaymentStatus(''); setSearchQuery(''); }}>Clear</button>
       </div>
@@ -283,8 +285,8 @@ export default function Orders() {
           <p>{searchQuery ? `No orders matching "${searchQuery}"` : 'No orders found.'}</p>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table className="data-table">
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
+          <table className="data-table" style={{ minWidth: 700 }}>
             <thead>
               <tr>
                 <th>Order No.</th>

@@ -720,7 +720,8 @@ const StockReceipts = () => {
 
           {/* Table */}
           <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid #e5eaf3', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: 820 }}>
               <thead>
                 <tr>
                   {['Receipt #', 'Delivery Ref', 'Delivery Date', 'Products', 'Total Recv.', 'Defective', 'Added to Stock', 'Received By', 'Recorded On', 'Action'].map(h => (
@@ -766,6 +767,7 @@ const StockReceipts = () => {
                 ))}
               </tbody>
             </table>
+            </div>{/* end receipts scroll wrapper */}
           </div>
 
           {pagination.total_pages > 1 && (
@@ -788,7 +790,8 @@ const StockReceipts = () => {
             </div>
           ) : (
             <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid #e5eaf3', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: 820 }}>
                 <thead>
                   <tr>
                     {['Delivery Date', 'Delivery Ref', 'Supplier', 'Product', 'Brand', 'Unit', 'Total Received', 'Total Defective', 'Total Accepted', 'Defect Rate'].map(h => (
@@ -825,6 +828,7 @@ const StockReceipts = () => {
                   ))}
                 </tbody>
               </table>
+              </div>{/* end defects scroll wrapper */}
             </div>
           )}
         </div>

@@ -611,7 +611,7 @@ const Reports = () => {
       </div>
 
       {/* Section Toggle */}
-      <div className="rp-section-toggle">
+      <div className="rp-section-toggle" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", display: "flex", flexWrap: "nowrap", gap: 0 }}>
         <button
           className={`rp-toggle-btn ${section === 'daily' ? 'active' : ''}`}
           onClick={() => setSection('daily')}
@@ -646,6 +646,8 @@ const Reports = () => {
               className="rp-date-input"
               value={selectedDate}
               max={today()}
+              placeholder="Select date"
+              style={{ colorScheme: 'light' }}
               onChange={(e) => setSelectedDate(e.target.value)}
             />
             <span className="rp-date-display">
@@ -815,12 +817,14 @@ const Reports = () => {
             <div style={{ minWidth: '150px' }}>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', marginBottom: '5px' }}>From Date</label>
               <input type="date" value={docDateFrom} onChange={e => setDocDateFrom(e.target.value)} max={today()}
-                style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d9e6', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }} />
+                placeholder="From date"
+                style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d9e6', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box', colorScheme: 'light' }} />
             </div>
             <div style={{ minWidth: '150px' }}>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', marginBottom: '5px' }}>To Date</label>
               <input type="date" value={docDateTo} onChange={e => setDocDateTo(e.target.value)} max={today()}
-                style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d9e6', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }} />
+                placeholder="To date"
+                style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d9e6', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box', colorScheme: 'light' }} />
             </div>
             {(docSearch || docDateFrom || docDateTo) && (
               <button onClick={() => { setDocSearch(''); setDocDateFrom(''); setDocDateTo(''); }}
@@ -857,8 +861,8 @@ const Reports = () => {
               );
 
               return (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: 820 }}>
                     <thead>
                       <tr style={{ background: '#f8faff' }}>
                         {['Order No.', 'Client', 'Completed Date', 'Docs', 'Manager Waybill', 'Manager Delivery Note', 'Collector Waybill', 'Collector Delivery Note', 'Invoice'].map(h => (

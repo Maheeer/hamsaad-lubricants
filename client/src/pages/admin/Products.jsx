@@ -363,7 +363,8 @@ const Products = () => {
         border: '1px solid ' + T.border,
         overflow: 'hidden',
       }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
           <thead>
             <tr>
               {['Product Name', 'Brand', 'Category', 'Size', 'Unit',
@@ -514,6 +515,7 @@ const Products = () => {
           </tbody>
         </table>
 
+        </div>{/* end scroll wrapper */}
         {/* Legend */}
         <div style={{
           padding: '10px 16px', borderTop: '1px solid ' + T.border,

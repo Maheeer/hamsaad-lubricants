@@ -38,8 +38,10 @@ const Catalogue = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [searchName, setSearchName]         = useState('');
   const [showPriceModal, setShowPriceModal] = useState(false);
+  const [showEditModal, setShowEditModal]   = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newPrice, setNewPrice] = useState('');
+  const [editForm, setEditForm] = useState({ name: '', size_variant: '', unit: '' });
   const [updating, setUpdating] = useState(false);
   const [expandedBrands, setExpandedBrands] = useState({});
   const printRef = useRef();
@@ -104,6 +106,27 @@ const Catalogue = () => {
       fetchData();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update price.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleEditProduct = async (e) => {
+    e.preventDefault();
+    if (!editForm.name.trim()) return toast.error('Product name is required.');
+    setUpdating(true);
+    try {
+      await updateProduct(selectedProduct.id, {
+        name:         editForm.name.trim(),
+        size_variant: editForm.size_variant.trim(),
+        unit:         editForm.unit.trim(),
+      });
+      toast.success('Product details updated.');
+      setShowEditModal(false);
+      setSelectedProduct(null);
+      fetchData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update product.');
     } finally {
       setUpdating(false);
     }
@@ -390,10 +413,11 @@ const Catalogue = () => {
                           </div>
 
                           {/* Products */}
-                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 520 }}>
                             <thead>
                               <tr>
-                                {['Product Name', 'Size Variant', 'Unit', 'Selling Price (NGN)', 'Action'].map((h) => (
+                                {['Product Name', 'Size Variant', 'Unit', 'Selling Price (NGN)', 'Actions'].map((h) => (
                                   <th key={h} style={{
                                     background: '#F7F9FC',
                                     color: T.textMid,
@@ -464,39 +488,44 @@ const Catalogue = () => {
                                     padding: '11px 20px',
                                     borderBottom: '1px solid ' + T.border,
                                   }}>
-                                    <button
-                                      onClick={() => {
-                                        setSelectedProduct(product);
-                                        setNewPrice(product.selling_price);
-                                        setShowPriceModal(true);
-                                      }}
-                                      style={{
-                                        background: T.white,
-                                        color: accent.bg,
-                                        border: '1.5px solid ' + accent.bg,
-                                        borderRadius: '7px',
-                                        padding: '5px 12px',
-                                        fontSize: '12px',
-                                        fontWeight: '700',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.15s',
-                                      }}
-                                      onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = accent.bg;
-                                        e.currentTarget.style.color = '#fff';
-                                      }}
-                                      onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = T.white;
-                                        e.currentTarget.style.color = accent.bg;
-                                      }}
-                                    >
-                                      Update Price
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                      <button
+                                        onClick={() => {
+                                          setSelectedProduct(product);
+                                          setNewPrice(product.selling_price);
+                                          setShowPriceModal(true);
+                                        }}
+                                        style={{
+                                          background: T.white, color: accent.bg,
+                                          border: '1.5px solid ' + accent.bg,
+                                          borderRadius: '7px', padding: '5px 12px',
+                                          fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+                                        }}
+                                      >
+                                        💰 Update Price
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setSelectedProduct(product);
+                                          setEditForm({ name: product.name, size_variant: product.size_variant || '', unit: product.unit || '' });
+                                          setShowEditModal(true);
+                                        }}
+                                        style={{
+                                          background: '#eef2ff', color: '#1F3864',
+                                          border: '1.5px solid #c7d2fe',
+                                          borderRadius: '7px', padding: '5px 12px',
+                                          fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+                                        }}
+                                      >
+                                        ✏️ Edit
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
+                          </div>{/* end scroll wrapper */}
                         </div>
                       );
                     })}
@@ -646,6 +675,78 @@ const Catalogue = () => {
                   }}
                 >
                   {updating ? 'Updating...' : 'Confirm Update'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Product Modal ── */}
+      {showEditModal && selectedProduct && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(15,25,50,0.6)', display: 'flex',
+          justifyContent: 'center', alignItems: 'center', zIndex: 1000,
+        }}>
+          <div style={{
+            background: T.white, borderRadius: '14px',
+            padding: '28px', width: '90%', maxWidth: '440px',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+          }}>
+            <h2 style={{ fontSize: '17px', fontWeight: '800', color: T.navy, marginBottom: '6px' }}>
+              Edit Product Details
+            </h2>
+            <p style={{ color: T.textMid, fontSize: '13px', marginBottom: '20px' }}>
+              Editing: <strong>{selectedProduct.brand_name}</strong> — {selectedProduct.category_name}
+            </p>
+            <form onSubmit={handleEditProduct}>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontWeight: '700', fontSize: '13px', color: T.textDark, marginBottom: '6px' }}>
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder="e.g. Rimula R4 X"
+                  required
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid ' + T.border, borderRadius: '8px', fontSize: '14px' }}
+                />
+              </div>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontWeight: '700', fontSize: '13px', color: T.textDark, marginBottom: '6px' }}>
+                  Size / Variant
+                </label>
+                <input
+                  type="text"
+                  value={editForm.size_variant}
+                  onChange={(e) => setEditForm({ ...editForm, size_variant: e.target.value })}
+                  placeholder="e.g. 4L, 20L, 208L"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid ' + T.border, borderRadius: '8px', fontSize: '14px' }}
+                />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontWeight: '700', fontSize: '13px', color: T.textDark, marginBottom: '6px' }}>
+                  Unit
+                </label>
+                <input
+                  type="text"
+                  value={editForm.unit}
+                  onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
+                  placeholder="e.g. litres, drums, pcs"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid ' + T.border, borderRadius: '8px', fontSize: '14px' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button type="button"
+                  onClick={() => { setShowEditModal(false); setSelectedProduct(null); }}
+                  style={{ background: T.white, color: T.textMid, border: '1.5px solid ' + T.border, borderRadius: '8px', padding: '9px 18px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={updating}
+                  style={{ background: updating ? '#8FA3BF' : T.navy, color: T.white, border: 'none', borderRadius: '8px', padding: '9px 20px', fontWeight: '700', fontSize: '13px', cursor: updating ? 'not-allowed' : 'pointer' }}>
+                  {updating ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>
