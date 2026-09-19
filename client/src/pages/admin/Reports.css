@@ -244,6 +244,31 @@
 /* ── Tables ─────────────────────────────────────────────────── */
 .rp-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Daily report stock sections — scrollable on mobile */
+.rp-stock-section,
+.rp-brand-sales,
+.rp-product-sales,
+.rp-summary-section {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rp-stock-section .rp-brand-block,
+.rp-summary-section .rp-brand-block {
+  min-width: 0;
+}
+
+/* Ensure tables inside daily tabs always scroll rather than overflow */
+.rp-tab-content .rp-table {
+  min-width: 500px;
+}
+
+.rp-tab-content .rp-brand-block {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .rp-table {
@@ -857,5 +882,32 @@
   .rp-summary-item {
     border-right: none;
     border-bottom: 1px solid #f0f3f9;
+  }
+
+  /* Daily report tab content — reduce padding and enable scroll */
+  .rp-tab-content {
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  /* Each table block inside daily tabs must scroll independently */
+  .rp-tab-content .rp-brand-block,
+  .rp-tab-content .rp-brand-sales,
+  .rp-tab-content .rp-product-sales {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -4px;
+    margin-right: -4px;
+    padding-bottom: 4px;
+  }
+
+  /* Stock movement grand total bar — wrap on small screens */
+  .rp-grand-total-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rp-gt-sep {
+    display: none;
   }
 }

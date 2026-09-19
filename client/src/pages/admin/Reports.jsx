@@ -38,6 +38,7 @@ const StockTable = ({ data, stockKey, label }) => {
             <h3>{brand}</h3>
             <span className="rp-brand-count">{products.length} products</span>
           </div>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <table className="rp-table">
             <thead>
               <tr>
@@ -73,6 +74,7 @@ const StockTable = ({ data, stockKey, label }) => {
               </tr>
             </tfoot>
           </table>
+          </div>
         </div>
       ))}
     </div>
@@ -281,7 +283,7 @@ const Reports = () => {
         );
       }
       return (
-        <div className="rp-brand-sales">
+        <div className="rp-brand-sales" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <table className="rp-table">
             <thead>
               <tr>
@@ -325,7 +327,7 @@ const Reports = () => {
         );
       }
       return (
-        <div className="rp-product-sales">
+        <div className="rp-product-sales" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <table className="rp-table">
             <thead>
               <tr>
@@ -403,6 +405,7 @@ const Reports = () => {
                 <h3>{brand}</h3>
                 <span className="rp-brand-count">{products.length} products</span>
               </div>
+              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               <table className="rp-table">
                 <thead>
                   <tr>
@@ -460,6 +463,7 @@ const Reports = () => {
                   </tr>
                 </tfoot>
               </table>
+              </div>
             </div>
           ))}
 

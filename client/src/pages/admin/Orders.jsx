@@ -255,12 +255,16 @@ export default function Orders() {
           <option value="part_paid">Part Paid</option>
           <option value="paid">Paid</option>
         </select>
-        <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}
-          placeholder="From date"
-          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
-        <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)}
-          placeholder="To date"
-          style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <label style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase', letterSpacing: '0.4px' }}>From date</label>
+          <input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <label style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase', letterSpacing: '0.4px' }}>To date</label>
+          <input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)}
+            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #dee2e6', fontSize: '13px', colorScheme: 'light' }} />
+        </div>
         <button className="btn-secondary" onClick={fetchOrders}>Filter</button>
         <button className="btn-secondary" onClick={() => { setFilterStatus(''); setFilterFrom(''); setFilterTo(''); setFilterPaymentStatus(''); setSearchQuery(''); }}>Clear</button>
       </div>

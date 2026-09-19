@@ -588,14 +588,14 @@ export default function Clients() {
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1F3864', marginBottom: '8px', textTransform: 'uppercase' }}>Products</label>
 
                 {/* Table header */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px 36px', gap: '8px', marginBottom: '6px', padding: '0 4px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 160px 36px', gap: '8px', marginBottom: '6px', padding: '0 4px' }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase' }}>Product</span>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase' }}>Direction</span>
                   <span />
                 </div>
 
                 {(alertForm.products || []).map((p, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 180px 36px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 160px 36px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
                     <select
                       value={p.product_id || ''}
                       onChange={(e) => {
@@ -609,7 +609,7 @@ export default function Clients() {
                           ),
                         }));
                       }}
-                      style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', width: '100%' }}
+                      style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', width: '100%', minWidth: 0, boxSizing: 'border-box' }}
                     >
                       <option value="">— Select product —</option>
                       {allProducts.map((prod) => (
@@ -659,13 +659,26 @@ export default function Clients() {
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1F3864', marginBottom: '8px', textTransform: 'uppercase' }}>Send To</label>
               <div style={{ display: 'flex', gap: '20px' }}>
                 {[{ value: 'all', label: 'All Clients' }, { value: 'specific', label: 'Specific Clients' }].map((opt) => (
-                  <label key={opt.value} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                  <label key={opt.value} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', userSelect: 'none' }}>
                     <input
                       type="radio"
                       name="alertTarget"
                       value={opt.value}
                       checked={alertForm.target === opt.value}
                       onChange={() => setAlertForm((prev) => ({ ...prev, target: opt.value, client_ids: [] }))}
+                      style={{
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        border: `2px solid ${alertForm.target === opt.value ? '#1F3864' : '#adb5bd'}`,
+                        background: alertForm.target === opt.value ? '#1F3864' : '#fff',
+                        boxShadow: alertForm.target === opt.value ? 'inset 0 0 0 4px #fff' : 'none',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        transition: 'all 0.15s',
+                      }}
                     />
                     {opt.label}
                   </label>
@@ -675,26 +688,68 @@ export default function Clients() {
 
             {alertForm.target === 'specific' && (
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1F3864', marginBottom: '6px', textTransform: 'uppercase' }}>Select Clients</label>
-                <div style={{ maxHeight: '150px', overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: '6px', padding: '8px', background: '#fff' }}>
-                  {clients.filter((c) => c.is_active).map((c) => (
-                    <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', fontSize: '13px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={(alertForm.client_ids || []).includes(c.id)}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setAlertForm((prev) => ({
-                            ...prev,
-                            client_ids: checked
-                              ? [...(prev.client_ids || []), c.id]
-                              : (prev.client_ids || []).filter((id) => id !== c.id),
-                          }));
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1F3864', marginBottom: '6px', textTransform: 'uppercase' }}>
+                  Select Clients{alertForm.client_ids?.length > 0 && <span style={{ marginLeft: '8px', background: '#1F3864', color: '#fff', borderRadius: '10px', padding: '1px 8px', fontSize: '11px', fontWeight: 700 }}>{alertForm.client_ids.length} selected</span>}
+                </label>
+                <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: '8px', background: '#fff' }}>
+                  {clients.filter((c) => c.is_active).map((c, idx) => {
+                    const isChecked = (alertForm.client_ids || []).includes(c.id);
+                    return (
+                      <label
+                        key={c.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '9px 12px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          borderBottom: idx < clients.filter((x) => x.is_active).length - 1 ? '1px solid #f0f0f0' : 'none',
+                          background: isChecked ? '#f0f4ff' : 'transparent',
+                          transition: 'background 0.12s',
+                          userSelect: 'none',
                         }}
-                      />
-                      {c.full_name} <span style={{ color: '#6c757d', fontSize: '12px' }}>({c.client_id})</span>
-                    </label>
-                  ))}
+                      >
+                        {/* Custom styled checkbox */}
+                        <span style={{
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '4px',
+                          border: `2px solid ${isChecked ? '#1F3864' : '#adb5bd'}`,
+                          background: isChecked ? '#1F3864' : '#fff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          transition: 'all 0.15s',
+                        }}>
+                          {isChecked && (
+                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                              <path d="M1 3.5L4 6.5L9 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          )}
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setAlertForm((prev) => ({
+                              ...prev,
+                              client_ids: checked
+                                ? [...(prev.client_ids || []), c.id]
+                                : (prev.client_ids || []).filter((id) => id !== c.id),
+                            }));
+                          }}
+                          style={{ display: 'none' }}
+                        />
+                        <span style={{ fontWeight: isChecked ? 600 : 400, color: '#1a1f36' }}>
+                          {c.full_name}
+                        </span>
+                        <span style={{ color: '#6c757d', fontSize: '12px', marginLeft: 'auto' }}>{c.client_id}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             )}
