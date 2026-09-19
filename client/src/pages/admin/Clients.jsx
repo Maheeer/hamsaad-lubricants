@@ -195,7 +195,14 @@ export default function Clients() {
     }
   };
 
-  // ── Send price alert ──────────────────────────────────────────
+  // ── Auto-clear success alert message after 15 seconds ────────
+  useEffect(() => {
+    if (alertMsg.startsWith('success:')) {
+      const timer = setTimeout(() => setAlertMsg(''), 15000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertMsg]);
+
   // ── Send price alert ──────────────────────────────────────────
   const handleSendAlert = async () => {
     setAlertMsg('');
@@ -587,15 +594,27 @@ export default function Clients() {
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#1F3864', marginBottom: '8px', textTransform: 'uppercase' }}>Products</label>
 
-                {/* Table header */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 160px 36px', gap: '8px', marginBottom: '6px', padding: '0 4px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase' }}>Product</span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase' }}>Direction</span>
-                  <span />
-                </div>
-
                 {(alertForm.products || []).map((p, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 160px 36px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                  <div key={i} style={{
+                    border: '1px solid #e9ecef',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    marginBottom: '8px',
+                    background: '#fdfdff',
+                  }}>
+                    {/* Product label + remove button row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase' }}>Product</span>
+                      {(alertForm.products || []).length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setAlertForm((prev) => ({ ...prev, products: prev.products.filter((_, idx) => idx !== i) }))}
+                          style={{ background: '#f8d7da', color: '#721C24', border: 'none', borderRadius: '6px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '16px', fontWeight: 700, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >×</button>
+                      )}
+                    </div>
+
+                    {/* Product select — full width always */}
                     <select
                       value={p.product_id || ''}
                       onChange={(e) => {
@@ -609,7 +628,7 @@ export default function Clients() {
                           ),
                         }));
                       }}
-                      style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', width: '100%', minWidth: 0, boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '9px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box', marginBottom: '8px', background: '#fff' }}
                     >
                       <option value="">— Select product —</option>
                       {allProducts.map((prod) => (
@@ -619,30 +638,26 @@ export default function Clients() {
                       ))}
                     </select>
 
-                    <select
-                      value={p.direction}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setAlertForm((prev) => ({
-                          ...prev,
-                          products: prev.products.map((item, idx) =>
-                            idx === i ? { ...item, direction: val } : item
-                          ),
-                        }));
-                      }}
-                      style={{ padding: '8px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', width: '100%' }}
-                    >
-                      <option value="increase">↑ Price Increase</option>
-                      <option value="decrease">↓ Price Decrease</option>
-                    </select>
-
-                    {(alertForm.products || []).length > 1 ? (
-                      <button
-                        type="button"
-                        onClick={() => setAlertForm((prev) => ({ ...prev, products: prev.products.filter((_, idx) => idx !== i) }))}
-                        style={{ background: '#f8d7da', color: '#721C24', border: 'none', borderRadius: '6px', width: '36px', height: '36px', cursor: 'pointer', fontSize: '18px', fontWeight: 700 }}
-                      >×</button>
-                    ) : <div />}
+                    {/* Direction label + select */}
+                    <div>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6c757d', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Direction</span>
+                      <select
+                        value={p.direction}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAlertForm((prev) => ({
+                            ...prev,
+                            products: prev.products.map((item, idx) =>
+                              idx === i ? { ...item, direction: val } : item
+                            ),
+                          }));
+                        }}
+                        style={{ width: '100%', padding: '9px 10px', border: '1px solid #dee2e6', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box', background: '#fff' }}
+                      >
+                        <option value="increase">↑ Price Increase</option>
+                        <option value="decrease">↓ Price Decrease</option>
+                      </select>
+                    </div>
                   </div>
                 ))}
 
